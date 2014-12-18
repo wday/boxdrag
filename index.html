@@ -14,7 +14,7 @@
     this.x = x;
     this.y = y;
     this.fillStyle = '#eee';
-    this.lineWidth = 7;
+    this.lineWidth = 1;
     this.strokeStyle = 'black';
   };
 
@@ -36,6 +36,11 @@
   }
 
   /**
+   * Inherit the superclass
+   */
+  Box.prototype = new DraggableShape();
+
+  /**
    * render function to display box
    */
   Box.prototype.render = function render(context) {
@@ -49,12 +54,54 @@
     context.stroke();
   }
 
+  /**
+   * check if click is contained within the bounds of this box.
+   *
+   * Note: would be nice to pad the bounds when linewidth > 1, as then you can click on the
+   *       the boundary line and be outside of the box. Kind of weird.
+   */
+  Box.prototype.contains = function (x, y) {
+    return x >= this.x &&
+           x <= this.x + this.width &&
+           y >= this.y &&
+           y <= this.y + this.height;
+  }
+
   window.Box = Box;
 }());
 
 var b = new Box(10, 10, 40, 40);
 
-var context = document.getElementById('box-container').getContext('2d');
+var container = document.getElementById('box-container');
+
+var context = container.getContext('2d');
+
+var clickOffsetLeft = 0;
+var clickOffsetTop  = 0;
+
+
+container.addEventListener('mousemove', function dragBox() {
+  if (typeof dragObject !== 'undefined') {
+    context.clearRect(0, 0, container.width, container.height);
+    dragObject.moveTo(event.x - this.offsetLeft - clickOffsetLeft,
+                      event.y - this.offsetTop - clickOffsetTop);
+    dragObject.render(context);
+  }
+});
+
+container.addEventListener('mousedown', function startDrag() {
+  var canvasX = event.x - this.offsetLeft;
+  var canvasY = event.y - this.offsetTop;
+  if (b.contains(event.x - this.offsetLeft, event.y - this.offsetTop)) {
+    dragObject = b;
+    clickOffsetTop = canvasY - b.y;
+    clickOffsetLeft = canvasX - b.x;
+  }
+});
+
+container.addEventListener('mouseup', function endDrag() {
+  dragObject = undefined;
+})
 
 b.render(context);
 
