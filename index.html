@@ -1,0 +1,61 @@
+<canvas id='box-container' width=400 height=400>
+</canvas>
+
+<script>
+(function(){
+
+  /**
+   * Draggable shape base class constructor.
+   *
+   * @param {x} position of left edge of shape
+   * @param {y} position of bottom of shape
+   */
+  function DraggableShape(x, y) {
+    this.x = x;
+    this.y = y;
+    this.fillStyle = '#eee';
+    this.lineWidth = 7;
+    this.strokeStyle = 'black';
+  };
+
+  /**
+   *
+   */
+  DraggableShape.prototype.moveTo = function moveTo(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  /**
+   * Box class
+   */
+  function Box(x, y, width, height) {
+    DraggableShape.call(this, x, y);
+    this.width = width;
+    this.height = height;
+  }
+
+  /**
+   * render function to display box
+   */
+  Box.prototype.render = function render(context) {
+    console.log('rendering box ' + this)
+    context.beginPath();
+    context.rect(this.x, this.y, this.width, this.height);
+    context.fillStyle = this.fillStyle;
+    context.fill();
+    context.lineWidth = this.lineWidth;
+    context.strokeStyle = this.strokeStyle;
+    context.stroke();
+  }
+
+  window.Box = Box;
+}());
+
+var b = new Box(10, 10, 40, 40);
+
+var context = document.getElementById('box-container').getContext('2d');
+
+b.render(context);
+
+</script>
